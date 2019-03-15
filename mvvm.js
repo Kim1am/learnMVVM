@@ -20,6 +20,7 @@ function Mvvm(options = {}) {
 
 // 数据劫持
 function Observe(data) {
+  let dep = new Dep()
   for (let key in data) {
     let val = data[key]
     observe(val)
@@ -27,6 +28,8 @@ function Observe(data) {
       configurable: true,
       enumerable: true,
       get() {
+        Dep.target && dep.addSub(Dep.target)
+        console.log(Dep.target)
         return val
       },
       set(newValue) {
@@ -34,7 +37,8 @@ function Observe(data) {
           return
         }
         val = newValue
-        // observe(newValue)
+        observe(newValue)
+        dep.notify()
       }
     })
   }
@@ -72,6 +76,7 @@ function Compile(el, vm) {
           // palceholder匹配的第n个括号字符串   A.B
           node.textContent = txt.replace(reg, (matched, placeholder) => {
             // vm为初始值，val为上一次return的值，key为当前值
+            new Watcher(vm, placeholder, replaceTxt)
             return placeholder.split('.').reduce((val, key) => {
               return val[key.trim()]
             }, vm)
@@ -90,4 +95,40 @@ function Compile(el, vm) {
   replace(fragment) // 替换内容
 
   vm.$el.appendChild(fragment) // 再将文档碎片放入el中
+}
+
+// 发布和订阅模式
+function Dep() {
+  this.subs = []
+}
+
+Dep.prototype = {
+  addSub(sub) {
+    this.subs.push(sub)
+  },
+  notify() {
+    this.subs.forEach(sub => {
+      sub.update()
+    })
+  }
+}
+
+// 监听
+function Watcher(vm, exp, fn) {
+  this.vm = vm
+  this.exp = exp
+  this.fn = fn
+  console.log(this)
+  Dep.target = this
+  let arr = exp.split('.')
+  let val = vm
+  arr.forEach(key => {
+    // 取值
+    val = val[key.trim()] // 获取到this.a.b，默认就会调用get方法
+  })
+  Dep.target = null
+}
+
+Watcher.prototype.update = function() {
+  this.fn()
 }
