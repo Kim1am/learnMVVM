@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div id="app">
+      <h2>{{person.name}}------{{person.age}}</h2>
+      <h3>{{person.fav}}</h3>
+      <h3>{{msg}}</h3>
+      <div v-text="msg"></div>
+      <div v-text="person.fav"></div>
+      <ul>
+        <li>1</li>
+        <li>2</li>
+        <li>3</li>
+      </ul>
+      <div v-html="htmlStr"></div>
+      <input type="text" v-model="person.fav" />
+      <button v-on:click="handlerClick"></button>
+      <button @click="handlerClick"></button>
+      <image v-bind:src="src" />
+    </div>
+    <script src="./Observer.js"></script>
+    <script src="./vue.js"></script>
+    <script>
+      let vm = new Vue({
+        el: '#app',
+        data: {
+          person: {
+            name: '张三',
+            age: 18,
+            fav: 'lady'
+          },
+          htmlStr: '1231231312313',
+          msg: 'testing',
+          src: 'https://www.baidu.com/img/bd_logo1.png?where=super'
+        },
+        methods: {
+          handlerClick() {
+            console.log(this)
+          }
+        }
+      })
+    </script>
+  </body>
+</html>
